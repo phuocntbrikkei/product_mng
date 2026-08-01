@@ -99,3 +99,7 @@ function getUserLogin() {
     return JSON.parse(localStorage.getItem("userLogin"))
 }
 
+function logout() {
+    localStorage.removeItem("userLogin")
+    window.location.reload()
+}

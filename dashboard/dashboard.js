@@ -2,6 +2,11 @@ if (!getUserLogin()) {
     location.href = "/auth"
 }
 
+let login_usernameEl = document.querySelector("#login_username");
+login_usernameEl.innerText = getUserLogin().username;
+
+console.log("getUserLogin()", getUserLogin())
+
 
 /* ---------------- DANH MỤC LOGIC ---------------- */
 function renderCategories() {
