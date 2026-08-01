@@ -10,13 +10,27 @@ let mod = {
 }
 
 let modList = [
-    mod
+    mod,
+    {
+        id: 2,
+        username: "admin2",
+        password: "123",
+        status: false, // false = khóa
+        isMaster: true
+    },
+    {
+        id: 3,
+        username: "admin3",
+        password: "123",
+        status: false, // false = khóa
+        isMaster: true
+    }
 ]
 
 /* Nếu có rồi thì lấy về, chưa có thì lưu lên (local storage) */
-if(!localStorage.getItem("modList")) {
+if (!localStorage.getItem("modList")) {
     localStorage.setItem("modList", JSON.stringify(modList))
-}else {
+} else {
     modList = JSON.parse(localStorage.getItem("modList"))
 }
 
@@ -26,7 +40,7 @@ if(!localStorage.getItem("modList")) {
 let category = {
     id: 1,  // định danh - danh mục
     title: "Máy Tính",
-    status: true
+    status: false
 }
 
 
@@ -34,11 +48,16 @@ let categoryList = [
     category
 ]
 
-if(!localStorage.getItem("categoryList")) {
+if (!localStorage.getItem("categoryList")) {
     localStorage.setItem("categoryList", JSON.stringify(categoryList))
-}else {
+} else {
     categoryList = JSON.parse(localStorage.getItem("categoryList"))
 }
+
+function saveCategoryListToLocal() {
+    localStorage.setItem("categoryList", JSON.stringify(categoryList))
+}
+
 // product (sản phẩm)
 
 let product = {
@@ -56,8 +75,15 @@ let productList = [
     product
 ]
 
-if(!localStorage.getItem("productList")) {
+if (!localStorage.getItem("productList")) {
     localStorage.setItem("productList", JSON.stringify(productList))
-}else {
+} else {
     productList = JSON.parse(localStorage.getItem("productList"))
 }
+
+
+/* dữ liệu người dùng login */
+function getUserLogin() {
+    return JSON.parse(localStorage.getItem("userLogin"))
+}
+

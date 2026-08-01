@@ -44,54 +44,41 @@ function handleLogin(event) {
     const userVal = document.getElementById('username').value.trim();
     const passVal = document.getElementById('password').value.trim();
 
-    console.log("userVal", userVal)
-    console.log("passVal", passVal)
-
     let userExsited = null;
 
-    for(let i = 0; i < modList.length; i++) {
-        if(modList[i].username == userVal) {
+    for (let i = 0; i < modList.length; i++) {
+        if (modList[i].username == userVal) {
             userExsited = modList[i];
             break
         }
     }
 
     /* check tồn tại */
-    if(!userExsited) {
+    if (!userExsited) {
         showAlert('Tài khoản không tồn tại!');
         return
     }
 
     /* check password */
-    if(userExsited.password != passVal) {
+    if (userExsited.password != passVal) {
         showAlert('Mật khẩu không chính xác');
+        return
+    }
+
+    /* check status */
+    if (!userExsited.status) {
+        showAlert('Tài khoản đã bị khóa')
         return
     }
 
     showAlert('Đăng nhập thành công!', 'success');
 
+    localStorage.setItem("userLogin", JSON.stringify(userExsited))
 
-
-
-
-
-    // // Check tài khoản
-    // if (userVal !== modData.username || passVal !== modData.password) {
-    //     showAlert('Tên đăng nhập hoặc mật khẩu không chính xác!');
-    //     return;
-    // }
-
-    // // Check trạng thái khóa
-    // if (!modData.status) {
-    //     showAlert('Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin cấp cao!');
-    //     return;
-    // }
-
-    // // Thành công
-    // showAlert('Đăng nhập thành công! Đang chuyển hướng...', 'success');
-
-    // setTimeout(() => {
-    //     // Thực hiện lưu session/token hoặc điều hướng tới Dashboard
-    //     console.log("Logged in user:", modData);
-    // }, 1200);
+    /* Sau 1s chuyển trang */
+    setTimeout(() => {
+        /* chuyển trang */
+        location.href = "/dashboard"
+    }, 2000); // 1000ms = 1s
+    
 }
