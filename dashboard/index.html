@@ -170,37 +170,38 @@
             </div>
 
             <form id="productForm" onsubmit="saveProduct(event)" class="p-6 space-y-4">
-                <input type="hidden" id="prodId">
+                <input name="input_id" type="hidden" id="prodId">
 
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Tên Sản Phẩm</label>
-                    <input type="text" id="prodName" required placeholder="Nhập tên sản phẩm..."
+                    <input name="input_name" type="text" id="prodName" required placeholder="Nhập tên sản phẩm..."
                         class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-300 mb-1">Giá Bán (VNĐ)</label>
-                        <input type="number" id="prodPrice" required min="0" placeholder="0"
+                        <input name="input_price" type="number" id="prodPrice" required min="0" placeholder="0"
                             class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-300 mb-1">Danh Mục</label>
-                        <select id="prodCategoryId" required
+                        <select name="input_category" id="prodCategoryId" required
                             class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
                             <!-- Options render dynamically -->
+                             <!-- <option value="5" >Test</option> -->
                         </select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Đường dẫn Hình Ảnh (URL)</label>
-                    <input type="url" id="prodImage" required placeholder="https://example.com/image.png"
+                    <input name="input_imgs" type="url" id="prodImage" required placeholder="https://example.com/image.png"
                         class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
                 </div>
 
                 <div class="flex items-center gap-3 pt-2">
-                    <input type="checkbox" id="prodStatus" checked
+                    <input name="input_status" type="checkbox" id="prodStatus" checked
                         class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/50">
                     <label for="prodStatus" class="text-xs text-slate-300 cursor-pointer">Đang bán (Trạng thái hoạt
                         động)</label>
@@ -220,137 +221,6 @@
 
     <script src="../data.js"></script>
     <script src="./dashboard.js"></script>
-
-
-    <!-- LOGIC XỬ LÝ JS -->
-    <script>
-
-
-        /* ---------------- SẢN PHẨM LOGIC ---------------- */
-        function renderProducts() {
-            const tbody = document.getElementById("productTableBody");
-            tbody.innerHTML = productList.map(prod => {
-                const cat = categoryList.find(c => c.id === prod.categoryId);
-                return `
-          <tr class="hover:bg-slate-700/20 transition">
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 p-1 flex items-center justify-center shrink-0 overflow-hidden">
-                  <img src="${prod.images[0] || ''}" alt="${prod.name}" class="object-contain w-full h-full" />
-                </div>
-                <div>
-                  <span class="font-semibold text-white block">${prod.name}</span>
-                  <span class="text-xs text-slate-500 font-mono">ID: #${prod.id}</span>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-700/50 text-slate-300 border border-slate-600/40">
-                ${cat ? cat.title : 'N/A'}
-              </span>
-            </td>
-            <td class="px-6 py-4 font-semibold text-indigo-400">
-              ${Number(prod.price).toLocaleString('vi-VN')} <span class="text-xs text-slate-400 font-normal">VNĐ</span>
-            </td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${prod.status ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
-                <span class="w-1.5 h-1.5 rounded-full ${prod.status ? 'bg-emerald-400' : 'bg-rose-400'}"></span> ${prod.status ? 'Đang bán' : 'Ẩn'}
-              </span>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <button onclick="openProductModal(${prod.id})" class="p-1.5 bg-slate-700/60 hover:bg-indigo-600/30 text-slate-300 hover:text-indigo-400 rounded-lg transition border border-slate-600/40 mr-1">
-                <i data-lucide="pencil" class="w-4 h-4"></i>
-              </button>
-              <button onclick="deleteProduct(${prod.id})" class="p-1.5 bg-slate-700/60 hover:bg-rose-600/30 text-slate-300 hover:text-rose-400 rounded-lg transition border border-slate-600/40">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
-            </td>
-          </tr>
-        `;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        function populateCategoryOptions(selectedCatId = null) {
-            const select = document.getElementById("prodCategoryId");
-            select.innerHTML = categoryList.map(c => `
-        <option value="${c.id}" ${c.id == selectedCatId ? 'selected' : ''}>${c.title}</option>
-      `).join('');
-        }
-
-        function openProductModal(id = null) {
-            const modal = document.getElementById("productModal");
-            const title = document.getElementById("productModalTitle");
-
-            populateCategoryOptions();
-
-            if (id) {
-                const prod = productList.find(p => p.id === id);
-                title.innerText = "Sửa Sản Phẩm";
-                document.getElementById("prodId").value = prod.id;
-                document.getElementById("prodName").value = prod.name;
-                document.getElementById("prodPrice").value = prod.price;
-                document.getElementById("prodCategoryId").value = prod.categoryId;
-                document.getElementById("prodImage").value = prod.images[0] || '';
-                document.getElementById("prodStatus").checked = prod.status;
-            } else {
-                title.innerText = "Thêm Sản Phẩm";
-                document.getElementById("productForm").reset();
-                document.getElementById("prodId").value = "";
-            }
-            modal.classList.remove("hidden");
-        }
-
-        function closeProductModal() {
-            document.getElementById("productModal").classList.add("hidden");
-        }
-
-        function saveProduct(e) {
-            e.preventDefault();
-            const id = document.getElementById("prodId").value;
-            const name = document.getElementById("prodName").value.trim();
-            const price = Number(document.getElementById("prodPrice").value);
-            const categoryId = Number(document.getElementById("prodCategoryId").value);
-            const imageUrl = document.getElementById("prodImage").value.trim();
-            const status = document.getElementById("prodStatus").checked;
-
-            if (id) {
-                // Edit
-                const prod = productList.find(p => p.id == id);
-                if (prod) {
-                    prod.name = name;
-                    prod.price = price;
-                    prod.categoryId = categoryId;
-                    prod.images = [imageUrl];
-                    prod.status = status;
-                }
-            } else {
-                // Add
-                const newProduct = {
-                    id: productList.length ? Math.max(...productList.map(p => p.id)) + 1 : 1,
-                    name,
-                    price,
-                    categoryId,
-                    status,
-                    images: [imageUrl]
-                };
-                productList.push(newProduct);
-            }
-
-            closeProductModal();
-            renderProducts();
-        }
-
-        function deleteProduct(id) {
-            if (confirm("Xác nhận xóa sản phẩm này?")) {
-                productList = productList.filter(p => p.id !== id);
-                renderProducts();
-            }
-        }
-    </script>
-
-
-
 </body>
 
 </html>

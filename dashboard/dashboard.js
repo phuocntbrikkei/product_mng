@@ -81,8 +81,8 @@ function saveCategory(event) {
             status: formEL.input_status.checked,
         }
 
-        for(let i = 0; i < categoryList.length; i++) {
-            if(categoryList[i].id == catId) {
+        for (let i = 0; i < categoryList.length; i++) {
+            if (categoryList[i].id == catId) {
                 categoryList[i] = editCategory
                 break;
             }
@@ -121,5 +121,162 @@ function deleteCategory(categoryId) {
     renderCategories()
 }
 
+
+
+/* ---------------- SẢN PHẨM LOGIC ---------------- */
+function renderProducts() {
+    const tbody = document.getElementById("productTableBody");
+    let productDataHtml = ``;
+
+    for (let i = 0; i < productList.length; i++) {
+
+        let prod = productList[i]
+
+        let cat = findCatById(prod.id)
+
+        productDataHtml += `
+        <tr class="hover:bg-slate-700/20 transition">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                  <img src="${prod.images[0] || ''}" alt="${prod.name}" class="object-contain w-full h-full" />
+                </div>
+                <div>
+                  <span class="font-semibold text-white block">${prod.name}</span>
+                  <span class="text-xs text-slate-500 font-mono">ID: #${prod.id}</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-700/50 text-slate-300 border border-slate-600/40">
+                ${cat ? cat.title : 'N/A'}
+              </span>
+            </td>
+            <td class="px-6 py-4 font-semibold text-indigo-400">
+              ${Number(prod.price).toLocaleString('vi-VN')} <span class="text-xs text-slate-400 font-normal">VNĐ</span>
+            </td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${prod.status ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                <span class="w-1.5 h-1.5 rounded-full ${prod.status ? 'bg-emerald-400' : 'bg-rose-400'}"></span> ${prod.status ? 'Đang bán' : 'Ẩn'}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <button onclick="openProductModal(${prod.id})" class="p-1.5 bg-slate-700/60 hover:bg-indigo-600/30 text-slate-300 hover:text-indigo-400 rounded-lg transition border border-slate-600/40 mr-1">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+              </button>
+              <button onclick="deleteProduct(${prod.id})" class="p-1.5 bg-slate-700/60 hover:bg-rose-600/30 text-slate-300 hover:text-rose-400 rounded-lg transition border border-slate-600/40">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          </tr>
+        `
+    }
+
+
+    tbody.innerHTML = productDataHtml;
+    lucide.createIcons();
+}
+
+function populateCategoryOptions(selectedCatId = null) {
+    const select = document.getElementById("prodCategoryId");
+
+    let optionDataHTML = '';
+
+    for (let i = 0; i < categoryList.length; i++) {
+        let c = categoryList[i]
+        optionDataHTML += `
+            <option value="${c.id}" >${c.title}</option>
+        `
+    }
+
+    //${c.id == selectedCatId ? 'selected' : ''}
+
+    select.innerHTML = optionDataHTML
+}
+
+function openProductModal(id = null) {
+    const modal = document.getElementById("productModal");
+    const title = document.getElementById("productModalTitle");
+
+    populateCategoryOptions();
+
+    if (id) {
+        const prod = productList.find(p => p.id === id);
+        title.innerText = "Sửa Sản Phẩm";
+        document.getElementById("prodId").value = prod.id;
+        document.getElementById("prodName").value = prod.name;
+        document.getElementById("prodPrice").value = prod.price;
+        document.getElementById("prodCategoryId").value = prod.categoryId;
+        document.getElementById("prodImage").value = prod.images[0] || '';
+        document.getElementById("prodStatus").checked = prod.status;
+    } else {
+        title.innerText = "Thêm Sản Phẩm";
+        document.getElementById("productForm").reset();
+        document.getElementById("prodId").value = "";
+    }
+    modal.classList.remove("hidden");
+}
+
+function closeProductModal() {
+    document.getElementById("productModal").classList.add("hidden");
+}
+
+function saveProduct(e) {
+    e.preventDefault();
+
+    let formEL = e.target;
+
+    let proEditId = formEL.input_id.value
+
+    if (proEditId) {
+        // sửa
+        let editProduct = {
+            id: proEditId,
+            name: formEL.input_name.value,
+            price: +formEL.input_price.value,
+            status: formEL.input_status.checked,
+            categoryId: formEL.input_category.value,
+            images: formEL.input_imgs.value.split(",")
+        }
+
+        for (let i = 0; i < productList.length; i++) {
+            if (productList[i].id == proEditId) {
+                productList[i] = editProduct
+                break;
+            }
+        }
+    } else {
+        // thêm
+        let newProduct = {
+            id: Date.now(),
+            name: formEL.input_name.value,
+            price: +formEL.input_price.value,
+            status: formEL.input_status.checked,
+            categoryId: formEL.input_category.value,
+            images: formEL.input_imgs.value.split(",")
+        }
+
+        productList.push(newProduct)
+    }
+
+
+    saveProductToLocal()
+    renderProducts()
+    closeProductModal()
+}
+
+function deleteProduct(prodId) {
+    for (let i = 0; i < productList.length; i++) {
+        if (productList[i].id == prodId) {
+            productList.splice(i, 1);
+            break;
+        }
+    }
+    saveProductToLocal()
+    renderProducts()
+}
+
+
 renderCategories();
+renderProducts();
 lucide.createIcons();

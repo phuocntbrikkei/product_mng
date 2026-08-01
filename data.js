@@ -58,6 +58,15 @@ function saveCategoryListToLocal() {
     localStorage.setItem("categoryList", JSON.stringify(categoryList))
 }
 
+function findCatById(catId) {
+    for (let j = 0; j < categoryList.length; j++) {
+        if (categoryList[j].id == catId) {
+            return categoryList[j]
+        }
+    }
+    return null
+}
+
 // product (sản phẩm)
 
 let product = {
@@ -81,6 +90,9 @@ if (!localStorage.getItem("productList")) {
     productList = JSON.parse(localStorage.getItem("productList"))
 }
 
+function saveProductToLocal() {
+    localStorage.setItem("productList", JSON.stringify(productList))
+}
 
 /* dữ liệu người dùng login */
 function getUserLogin() {
